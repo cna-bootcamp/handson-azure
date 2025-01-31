@@ -573,7 +573,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ssh azureuser@{공용 IP 주소}
   ```
 
-- Ngix 설치
+- Nginx 설치
 
   ```
   sudo apt update
