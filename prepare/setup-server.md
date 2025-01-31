@@ -6,12 +6,15 @@
   - [Azure 구독(무료 평가판)](#azure-구독무료-평가판)
   - [Azure 구독(유료 서비스)](#azure-구독유료-서비스)
   - [리소스 프로바이더 등록](#리소스-프로바이더-등록)
+  - [리소스 그룹 생성](#리소스-그룹-생성)
   - [Azure CLI 설치 및 로그인(Windows Only)](#azure-cli-설치-및-로그인windows-only)
   - [Azure CLI 설치 및 로그인(Mac Only)](#azure-cli-설치-및-로그인mac-only)
-  - [리소스 그룹 생성](#리소스-그룹-생성)
   - [기본 configuration 셋팅](#기본-configuration-셋팅)
   - [AKS/ACR 생성, 삭제](#aksacr-생성-삭제)
 
+> 실습환경에서는 Azure 구독, 리소스 프로바이더 등록, 리소스 그룹 생성은 이미 되어 있으므로 할 필요 없습니다.   
+> 리소스 그룹명은 Azure포탈(https://portal.azure.com)에서 확인합니다.    
+> ![](images/2025-01-31-15-00-42.png)
 ---
 
 ## Azure 구독(무료 평가판)
@@ -70,6 +73,16 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 
 'Microsoft.ContainerService'를 등록합니다.  
 ![](images/2025-01-31-11-10-43.png)  
+
+| [Top](#목차) |
+
+---
+
+## 리소스 그룹 생성 
+1. 리소스 그룹 생성  
+리소스 그룹을 생성합니다. 
+![](images/2025-01-31-09-37-57.png)  
+![](images/2025-01-31-09-38-15.png)  
 
 | [Top](#목차) |
 
@@ -140,59 +153,6 @@ No subscriptions found for unicorn.agile.ai@gmail.com.
 ```
 az login --tenant {tenant id}
 ```
-
-| [Top](#목차) |
-
----
-
-## 리소스 그룹 생성 
-1. 리소스 그룹 생성  
-리소스 그룹을 생성합니다. 
-![](images/2025-01-31-09-37-57.png)  
-![](images/2025-01-31-09-38-15.png)  
-
-※ 참조: 리소스 그룹 생성 (CLI 이용)
-  ```
-  az group create --name unicorn-rg --location koreacentral
-  ```
-
-2. 참조 명령어  
-사용 가능한 리소스 그룹 조회
-- 모든 리소스 그룹 조회
-  ```
-  az group list --output table
-  ```
-
-- 특정 키워드로 리소스 그룹 검색 (예: 'dev' 포함된 리소스 그룹)
-  ```
-  az group list --query "[?contains(name, 'dev')]" --output table
-  ```
-
-- 특정 위치의 리소스 그룹 검색 (예: koreacentral)
-  ```
-  az group list --query "[?location=='koreacentral']" --output table
-  ```
-
-- 본인의 권한 확인
-  ```
-  # 리소스 그룹의 액세스 제어(IAM) 정보 확인
-  az role assignment list --resource-group $MYRG --output table
-
-  # 특정 리소스 그룹에 대한 본인의 역할 확인: Principal은 위 명령 결과값 참조 
-  az role assignment list --assignee {Principal} --resource-group $MYRG --output table
-  ```
-
-- 리소스 그룹 내 기존 리소스 확인
-  ```
-  # 리소스 그룹 내 모든 리소스 조회
-  az resource list --resource-group $MYRG --output table
-
-  # 리소스 유형별 필터링 (예: App Service만 조회)
-  az resource list --resource-group $MYRG --query "[?type=='Microsoft.Web/sites']" --output table
-
-  # 태그별 필터링 (예: 'environment=development' 태그가 있는 리소스)
-  az resource list --resource-group $MYRG --query "[?tags.environment=='development']" --output table
-  ```
 
 | [Top](#목차) |
 
