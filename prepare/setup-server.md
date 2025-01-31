@@ -729,7 +729,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   sudo ln -s /snap/bin/certbot /usr/bin/certbot
   ```
  
-- 인증서 만들기  
+- SSL 인증서 만들기  
   '{domain}'은 위 SSL설정의 'server_name'에 지정한 {본인ID}.{VM Public IP}.nip.io을 사용합니다.  
   ```
   sudo certbot --nginx -d {domain}
@@ -785,6 +785,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
   기존 설정에 SSL 설정을 추가합니다.  
   'server_name'은 {본인ID}.{VM Public IP}.nip.io로 지정합니다.  
+  ssl key 파일의 경로는 위 SSL 인증서 생성 결과 마지막 쯤에 있는 값과 동일하게 설정합니다.  
   'location' 섹션은 proxying을 위한 설정입니다. 이는 나중에 사용하니 아래 내용을 그대로 사용합니다.  
   ```
   server {
