@@ -91,7 +91,7 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 ## Azure CLI 설치 및 로그인(Windows Only)
 Window사용자는 MobaXTerm을 사용하여 로컬 Ubuntu에서 작업 합니다.   
 
-- 로컬 Ubuntu 로그인(Windows Only) 
+- 로컬 Ubuntu 로그인(Windows Only)   
   MobaXTerm을 실행하고 작성한 WSL세션을 클릭하여 로그인합니다.  
   **이후 작업은 모두 로컬 ubuntu에서 수행**합니다.  
 
