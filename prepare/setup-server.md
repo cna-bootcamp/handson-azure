@@ -11,6 +11,11 @@
   - [Azure CLI 설치 및 로그인(Mac Only)](#azure-cli-설치-및-로그인mac-only)
   - [기본 configuration 셋팅](#기본-configuration-셋팅)
   - [AKS/ACR 생성, 삭제](#aksacr-생성-삭제)
+  - [VNET,NSG,SNET 생성](#vnetnsgsnet-생성)
+  - [VNET Peering](#vnet-peering)
+  - [Azure 서비스에 VNET/Subnet 연결](#azure-서비스에-vnetsubnet-연결)
+  - [Bastion VM 생성](#bastion-vm-생성)
+  - [nginx 서버 설치](#nginx-서버-설치)
 
 > 실습환경에서는 Azure 구독, 리소스 프로바이더 등록, 리소스 그룹 생성은 이미 되어 있으므로 할 필요 없습니다.   
 > 리소스 그룹명은 Azure포탈(https://portal.azure.com)에서 확인합니다.    
@@ -200,11 +205,12 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   --generate-ssh-keys
   ```
   
-  > Tip: **VM Size type 보기** 
+  > Tip: **VM Size type 보기**  
+  > [도움말](https://learn.microsoft.com/ko-kr/azure/virtual-machines/sizes/overview?tabs=breakdownseries%2Cgeneralsizelist%2Ccomputesizelist%2Cmemorysizelist%2Cstoragesizelist%2Cgpusizelist%2Cfpgasizelist%2Chpcsizelist)   
   > ```
   > https://portal.azure.com/#view/Microsoft_Azure_Compute/SpecPickerV2Blade/subscriptionId/22e2a034-41ca-431a-b73d-6d2be7dde51f/regionId/koreacentral/hideCost~/false/specFiltering~/%7B%22disabledSpecs%22%3A%5B%5D%2C%22platform%22%3A%22Linux%22%2C%22hideDiskTypeFilter%22%3Afalse%2C%22zone%22%3A%5B%5D%2C%22minMemoryGB%22%3A4%2C%22minvCPUs%22%3A2%2C%22securityType%22%3A%22AllowAll%22%7D
   > ```
-  > [도움말](https://learn.microsoft.com/ko-kr/azure/virtual-machines/sizes/overview?tabs=breakdownseries%2Cgeneralsizelist%2Ccomputesizelist%2Cmemorysizelist%2Cstoragesizelist%2Cgpusizelist%2Cfpgasizelist%2Chpcsizelist)
+  > 
   > 제일 많이 사용하는 VM Size type(마지막 컬럼의 비용은 월 사용비용임)  
   > **교육시에는 'Standard_B2s'를 사용하고 MVP개발시에는 'Standard_DS3_V2' 사용**   
   > ![](images/2025-01-31-11-11-53.png)  
@@ -302,4 +308,406 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
 | [Top](#목차) |
 
 ---
- 
+
+## VNET,NSG,SNET 생성  
+- 목적: 통신이 필요한 Azure서비스(예: VM, Azure 관리용 DB, Azure WebApp)를 만들기 위함    
+  - VNET(Virtual Network: 가상 네트워크)   
+    - 외부와 통신하기 위한 기본 네트워크 환경 제공
+    - 비유) 아파트 단지와 같이 다른 건물들(Azure서비스)이 들어설 수 있는 가상 공간 제공      
+  - SNET(Subnet)
+    - VNet을 각 Azure서비스의 목적별로 더 작게 분할한 네트워크 환경 제공  
+    - 비유) 아파트 단지의 각 구역(상가지역, 커뮤니티 공간, 거주지역)별로 나누는 것과 유사  
+  - NSG(Network Security Group)
+    - 각 Subnet에 적용하는 Inboud/Outbound 정책을 설정하는 리소스  
+
+- HOW
+  아래 예와 같이 Resource Group > VNET > Subnet > NIC의 계층적 구조로 만들어집니다.  
+  NIC는 Subnet에서 하나의 IP를 부여 받아 VM에 할당하게 됩니다.  
+  NSG는 Subnet에 적용되어 inbound/outbound 통신을 제어합니다.   
+  ![](images/2025-02-01-02-46-27.png)
+
+- 기본 파라미터와 변수 설정  
+  'ID'값은 본인ID로 변경해야 함  
+  ```
+  az configure -l -o table
+
+  export ID=dg0100
+  az configure --defaults group=${ID}-rg location=koreacentral
+
+  export ADDR_PREFIX=10.17.0
+  export VNET=${ID}-vnet  
+  export NSG=${ID}-nsg
+  export PUB_SNET=${ID}-pub-snet
+  export PRI_SNET=${ID}-pri-snet
+  export PE_SNET=${ID}-pe-snet
+  export PSQL_SNET=${ID}-psql-snet
+  ```
+
+- 기존 생성 객체 확인  
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
+  ```
+  az network vnet list -o table
+  az network nsg list -o table
+  az network vnet subnet list --vnet-name ${VNET} -o table
+  ```
+
+- VNET 생성  
+  주소 공간은 모든 서브넷을 포함할 수 있도록 지정해야 합니다.  
+  주소 공간은 private ip 대역대인 10, 172, 192로 시작해야 합니다.  
+  슬래쉬 뒤의 값은 IP의 갯수를 의미합니다. 갯수를 계산하는 공식은 2^(32-{지정값})입니다.  
+  '24'로 지정하면 2^8승이므로 256개의 IP를 지정할 수 있다는 의미입니다.  
+  ```
+  # VNet 생성
+  az network vnet create -n ${VNET} --address-prefix ${ADDR_PREFIX}.0/24
+
+  # VNet 확인 
+  az network vnet list -o table 
+  ```
+
+- NSG 생성
+  ```
+  # NSG(Network Security Group) 생성  
+  az network nsg create -n ${NSG}
+
+  # NSG 확인
+  az network nsg list -o table
+  ```
+
+- SNET 생성  
+  각 목적별로 Subnet 객체를 생성합니다.  
+  - 퍼블릭 서브넷(pub-snet)
+    - 외부와 직접 통신이 필요한 서비스 배치
+    - 예: 웹 서버, 로드 밸런서
+  - 프라이빗 서브넷(pri-snet)
+    - 외부와 직접 통신이 필요 없는 서비스 배치
+    - 예: 내부 애플리케이션 서버
+  - Private Endpoint 서브넷(pe-snet)
+    - Azure 서비스와의 프라이빗 연결을 위한 공간
+    - 예: Storage Account, Key Vault와의 보안 연결
+  - 데이터베이스 서브넷(psql-snet)
+    - 데이터베이스 전용 공간
+    - 더 엄격한 보안 규칙 적용 가능
+
+  각 Subnet당 32개의 IP를 사용하도록 만듭니다.  
+  앞 5개의 IP는 Azure시스템에서 사용하므로 실제로는 27개의 IP를 사용할 수 있습니다.  
+  Private Endpoint 서브넷은 Azure PaaS 서비스(Storage, SQL, KeyVault 등)에 대한 프라이빗 연결을 제공하므로,  
+  'private-endpoint-network-policies'옵션을 Disable하여 NSG에 설정된 정책이 Subnet에 적용되지 않게 해야 합니다.    
+  
+  아래 예에서는 모든 Subnet이 동일한 NSG를 공유하나 실제로는 각 Subnet별로 별도의 NSG를 갖는것이 더 일반적입니다.  
+  ```
+  # 각 서브넷 생성
+  az network vnet subnet create -n ${PUB_SNET} \
+    --vnet-name ${VNET} \
+    --address-prefix ${ADDR_PREFIX}.0/27 \
+    --network-security-group ${NSG}
+
+  az network vnet subnet create -n ${PRI_SNET} \
+    --vnet-name ${VNET} \
+    --address-prefix ${ADDR_PREFIX}.32/27 \
+    --network-security-group ${NSG}
+
+  az network vnet subnet create -n ${PE_SNET} \
+    --vnet-name ${VNET} \
+    --address-prefix ${ADDR_PREFIX}.64/27 \
+    --private-endpoint-network-policies Disabled \
+    --network-security-group ${NSG}
+
+  az network vnet subnet create -n ${PSQL_SNET} \
+    --vnet-name ${VNET} \
+    --address-prefix ${ADDR_PREFIX}.96/27 \
+    --network-security-group ${NSG}
+
+  # 서브넷 생성 확인
+  az network vnet subnet list --vnet-name ${VNET} -o table 
+  ```
+
+- 기존 서브넷의 주소 공간과 사용량 확인
+  ```
+  # 서브넷 상세 정보 확인
+  az network vnet subnet show -n {subnet} --vnet-name $VNET
+
+  # 서브넷의 IP 사용현황 확인
+  az network vnet subnet list-available-ips -n {subnet} --vnet-name $VNET
+  ```
+
+| [Top](#목차) |
+
+---
+
+## VNET Peering  
+VNET간에 Peering을 통해 통신할 수 있습니다.  
+실습할 필요는 없고 이론적으로 이해만 하시면 됩니다.  
+
+```
+# 기존 VNET 피어링 확인
+az network vnet peering list --vnet-name $VNET
+```
+
+아래는 VNET Peering 예제 입니다.  
+```
+# VNET Peering 
+az network vnet peering create \
+--name {peering name} \
+--vnet-name $VNET \
+--remote-vnet {대상 VNET명} \
+--allow-vnet-access
+```
+
+| [Top](#목차) |
+
+---
+
+## Azure 서비스에 VNET/Subnet 연결  
+
+실습할 필요는 없고 이해만 하시면 됩니다.  
+```
+# Azure WebApp Service 예시: Private endpoint subnet을 연결  
+az webapp vnet-integration add \
+  --name {app-name} \
+  --vnet $VNET \
+  --subnet ${PE_SNET}
+```
+
+2. Application Gateway 설정
+
+```
+# Application Gateway VNET/Subnet 연결 
+az network application-gateway create \
+  --name {gateway-name} \
+  --vnet-name $VNET \
+  --subnet {subnet-name} \
+  --public-ip-address {public-ip-name} \
+  --sku Standard_v2
+```
+
+| [Top](#목차) |
+
+---
+
+## Bastion VM 생성  
+AKS 접근을 위한 bastion서버와 nginx 서버 설치를 위해 VM을 생성합니다.  
+bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통해 접근하기 위한 Gateway역할 서버입니다.  
+
+- VM 생성
+  Public Subnet에 연결합니다.  
+  Size는 1Core/1GB의 가장 낮은 사양인 'Standard_B1s'로 지정합니다.  
+  ```
+  az vm create \
+    -n ${ID}-bastion \
+    --image Ubuntu2204 \
+    --admin-username azureuser \
+    --generate-ssh-keys \
+    --vnet-name ${VNET} \
+    --subnet ${PUB_SNET} \
+    --size Standard_B1s
+  ```
+
+  아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
+  ![](images/2025-02-01-03-32-16.png)  
+
+- Subnet에 자동 생성된 NSG 연결  
+  현재 연결된 NSG를 확인합니다.  'networkSecurityGroup' 항목에서 확인할 수 있습니다.  
+  ```
+  az network vnet subnet show -n ${PUB_SNET} --vnet-name $VNET
+  ```
+
+  틀린 경우 아래와 같이 변경합니다.  
+  ```
+  az network vnet subnet update \
+  -n ${PUB_SNET} \
+  --vnet-name ${ID}-vnet \
+  --network-security-group ${ID}-bastionNSG
+  ```
+
+- VM 접속    
+  ```
+  # VM의 Public IP 확인
+  az vm show -d -n ${ID}-bastion --query publicIps -o tsv
+  ```
+
+  ```
+  ssh azureuser@{공용 IP 주소}
+  ```
+
+| [Top](#목차) |
+
+---
+
+## nginx 서버 설치  
+
+- Ngix 설치
+
+  ```
+  sudo apt update
+  sudo apt install nginx -y
+  ```
+
+  ```
+  sudo systemctl start nginx
+  sudo systemctl enable nginx
+  ```
+
+  ```
+  sudo systemctl status nginx
+  ```
+
+- PORT 오픈   
+  생성된 NSG의 포트를 오픈 합니다.  
+  NSG의 이름은 VM이름 뒤에 NSG가 붙어서 생성됩니다.  
+  'priority'는 100~4096사이의 값으로 중복되지 않게 지정합니다.  
+  
+  ```
+  # 80 포트 오픈
+  export PORT=80  
+  az network nsg rule create \
+  --nsg-name ${ID}-bastionNSG \
+  --name Allow-HTTP-$PORT \
+  --priority 100 \
+  --access Allow \
+  --direction Inbound \
+  --protocol Tcp \
+  --source-port-ranges '*' \
+  --destination-port-ranges $PORT
+  ```
+
+  ```
+  # 443 포트 오픈
+  export PORT=443  
+  az network nsg rule create \
+  --nsg-name ${ID}-bastionNSG \
+  --name Allow-HTTPS-$PORT \
+  --priority 200 \
+  --access Allow \
+  --direction Inbound \
+  --protocol Tcp \
+  --source-port-ranges '*' \
+  --destination-port-ranges $PORT
+  ```
+  
+  rule 확인  
+  ```
+  az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
+  ```
+
+- Nginx 환경설정
+  ```
+  vi /etc/nginx/nginx.conf
+  ```
+  
+  아래 내용으로 변경합니다.  
+  ```
+  user www-data;
+  worker_processes auto;
+  pid /run/nginx.pid;
+  events {
+      worker_connections 768;
+  }
+  http {
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      keepalive_timeout 65;
+      types_hash_max_size 2048;
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+      access_log /var/log/nginx/access.log;
+      error_log /var/log/nginx/error.log;
+      gzip on;
+      include /etc/nginx/conf.d/*.conf;
+      include /etc/nginx/sites-enabled/*;
+  }
+  ```
+  
+  80포트에 대한 설정을 합니다.  
+  ```
+  sudo vi /etc/nginx/sites-available/default
+  ```
+
+  ```
+  server {
+      listen 80;
+      server_name _;
+      root /var/www/html;
+      index index.html;
+      location / {
+          try_files $uri $uri/ =404;
+      }
+  }
+  ```
+
+  설정이 적용 되려면 '/etc/nginx/sites-enabled'에 링크를 만들어야 합니다.  
+  ```
+  sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+  ```
+
+  설정에 문제가 없는지 테스트 하고 nginx서버를 재시작 합니다.  
+  ```
+  sudo nginx -t
+  sudo systemctl reload nginx
+  ```
+
+- 테스트
+  ```
+  sudo vi /var/www/html/index.html
+  ``` 
+
+  ```  
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to My Website</title>
+      <style>
+          body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              background-color: #f4f4f9;
+              color: #333;
+              text-align: center;
+          }
+          header {
+              background-color: #0078d7;
+              color: white;
+              padding: 1rem 0;
+          }
+          main {
+              padding: 2rem;
+          }
+          footer {
+              margin-top: 2rem;
+              background-color: #333;
+              color: white;
+              padding: 1rem 0;
+              font-size: 0.8rem;
+          }
+      </style>
+  </head>
+  <body>
+      <header>
+          <h1>Welcome to My Website</h1>
+          <p>This is a simple HTML page</p>
+      </header>
+      <main>
+          <h2>Hello, World!</h2>
+          <p>Thank you for visiting. This page is styled with basic CSS.</p>
+      </main>
+      <footer>
+          &copy; 2024 My Website. All rights reserved.
+      </footer>
+  </body>
+  </html>
+  ```
+
+  웹브라우저에서 'http://{VM Public IP}'로 접근하여 정상적으로 표시되는지 확인합니다.  
+
+
+| [Top](#목차) |
+
+---
+
+
+
+
+
