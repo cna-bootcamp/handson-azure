@@ -16,6 +16,7 @@
   - [Azure 서비스에 VNET/Subnet 연결](#azure-서비스에-vnetsubnet-연결)
   - [Bastion VM 생성](#bastion-vm-생성)
   - [nginx 서버 설치](#nginx-서버-설치)
+  - [SSL 설정](#ssl-설정)
 
 > 실습환경에서는 Azure 구독, 리소스 프로바이더 등록, 리소스 그룹 생성은 이미 되어 있으므로 할 필요 없습니다.   
 > 리소스 그룹명은 Azure포탈(https://portal.azure.com)에서 확인합니다.    
@@ -711,7 +712,67 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
   웹브라우저에서 'http://{VM Public IP}'로 접근하여 정상적으로 표시되는지 확인합니다.  
   ![](images/2025-02-01-05-12-08.png)
-  
+
+
+| [Top](#목차) |
+
+---
+
+## SSL 설정  
+- SSL 설정 추가  
+  ```
+  sudo vi /etc/nginx/sites-available/default 
+  ```
+
+  기존 설정에 아래 설정을 추가합니다.  
+  'server_name'은 {본인ID}.{VM Public IP}.nip.io로 지정합니다.  
+  'location' 섹션은 proxying을 위한 설정입니다. 이는 나중에 사용하니 아래 내용을 그대로 사용합니다.  
+  ```
+  server {
+      listen 443 ssl;
+      server_name dg0100.4.217.252.231.nip.io;
+      ssl_protocols TLSv1.2 TLSv1.3;
+      ssl_ciphers HIGH:!aNULL:!MD5;
+      location / {
+          #proxy_pass http://20.214.113.85:80;
+          proxy_ssl_verify off;
+          proxy_buffer_size 64k;
+          proxy_buffers 4 64k;
+          proxy_busy_buffers_size 64k;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_read_timeout 60s;
+          proxy_connect_timeout 60s;
+          proxy_send_timeout 60s;
+      }
+  }
+  ```
+
+- 정식 SSL 인증서 받기  
+  인증서 생성 프로그램 설치  
+  ```
+  sudo apt update
+  sudo apt install snapd
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+  ```
+ 
+- 인증서 만들기  
+  '{domain}'은 위 SSL설정의 'server_name'에 지정한 {본인ID}.{VM Public IP}.nip.io을 사용합니다.  
+  ```
+  sudo certbot --nginx -d {domain}
+  ```
+
+- nginx 서버 재시작  
+  ```
+  sudo nginx -t
+  sudo systemctl reload nginx
+  ```
+
+- 테스트  
+   웹브라우저에서 'https://{VM Public IP}'로 접근하여 정상적으로 표시되는지 확인합니다.    
 
 | [Top](#목차) |
 
