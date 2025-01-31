@@ -294,5 +294,12 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   결과는 Azure Portal의 ACR 페이지에서 확인할 수 있습니다.    
   ![](images/2025-01-31-15-06-16.png)  
 
+- 참고
+  - [AKS/ACR 생성 shell](https://drive.google.com/file/d/1Ho48T-R-t9lcZ3mfPgARwYQqOTViM-TI/view?usp=drive_link)  
+  - [AKS/ACR 삭제 shell](https://drive.google.com/file/d/1TibLKAnBE8CedyyUrvW0I1IXGUWTHqZf/view?usp=drive_link)  
+   
+
 | [Top](#목차) |
 
+---
+ 
