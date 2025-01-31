@@ -291,5 +291,8 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   az aks update -n dg0100-aks --attach-acr $ACR_ID
   ```
 
+  결과는 Azure Portal의 ACR 페이지에서 확인할 수 있습니다.    
+  ![](images/2025-01-31-15-06-16.png)  
+
 | [Top](#목차) |
 
