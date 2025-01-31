@@ -591,7 +591,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
 - Nginx 환경설정
   ```
-  vi /etc/nginx/nginx.conf
+  sudo vi /etc/nginx/nginx.conf
   ```
   
   아래 내용으로 변경합니다.  
