@@ -519,38 +519,6 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   --network-security-group ${ID}-bastionNSG
   ```
 
-- VM 접속    
-  ```
-  # VM의 Public IP 확인
-  az vm show -d -n ${ID}-bastion --query publicIps -o tsv
-  ```
-
-  ```
-  ssh azureuser@{공용 IP 주소}
-  ```
-
-| [Top](#목차) |
-
----
-
-## nginx 서버 설치  
-
-- Ngix 설치
-
-  ```
-  sudo apt update
-  sudo apt install nginx -y
-  ```
-
-  ```
-  sudo systemctl start nginx
-  sudo systemctl enable nginx
-  ```
-
-  ```
-  sudo systemctl status nginx
-  ```
-
 - PORT 오픈   
   생성된 NSG의 포트를 오픈 합니다.  
   NSG의 이름은 VM이름 뒤에 NSG가 붙어서 생성됩니다.  
@@ -587,6 +555,37 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   rule 확인  
   ```
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
+  ```
+
+| [Top](#목차) |
+
+---
+
+## nginx 서버 설치  
+- VM 접속    
+  ```
+  # VM의 Public IP 확인
+  az vm show -d -n ${ID}-bastion --query publicIps -o tsv
+  ```
+
+  ```
+  ssh azureuser@{공용 IP 주소}
+  ```
+  
+- Ngix 설치
+
+  ```
+  sudo apt update
+  sudo apt install nginx -y
+  ```
+
+  ```
+  sudo systemctl start nginx
+  sudo systemctl enable nginx
+  ```
+
+  ```
+  sudo systemctl status nginx
   ```
 
 - Nginx 환경설정
