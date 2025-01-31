@@ -571,7 +571,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
   ssh azureuser@{공용 IP 주소}
   ```
-  
+
 - Ngix 설치
 
   ```
@@ -594,6 +594,15 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
   
   아래 내용으로 변경합니다.  
+  Windows 사용자는 MobaXTerm에서 기본 에디터를 사용하여 변경해도 됩니다.   
+  vi를 이용하려면 아래 순서로 작업합니다.  
+  - 맨 위로 커서를 옮기기
+  - '1000dd'를 입력하여 기존 내용 모두 삭제  
+  - 'i'를 눌러 편집 모드로 변경   
+  - 아래 내용을 클립보드에 복사한 후 CTRL-V(맥은 Command-V)키로 붙여넣기 함  
+  - ESC누른 후 ':'을 입력하여 명령모드로 전환  
+  - 맨 아래 콜론 뒤에 'wq'를 입력하고 Enter키를 누름  
+  
   ```
   user www-data;
   worker_processes auto;
