@@ -645,6 +645,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
   설정이 적용 되려면 '/etc/nginx/sites-enabled'에 링크를 만들어야 합니다.  
   ```
+  sudo rm -f /etc/nginx/sites-enabled/default
   sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
   ```
 
@@ -709,7 +710,8 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
 
   웹브라우저에서 'http://{VM Public IP}'로 접근하여 정상적으로 표시되는지 확인합니다.  
-
+  ![](images/2025-02-01-05-12-08.png)
+  
 
 | [Top](#목차) |
 
