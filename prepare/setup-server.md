@@ -719,18 +719,93 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 ---
 
 ## SSL 설정  
-- SSL 설정 추가  
+
+- 정식 SSL 인증서 받기  
+  인증서 생성 프로그램 설치  
+  ```
+  sudo apt update
+  sudo apt install snapd
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+  ```
+ 
+- 인증서 만들기  
+  '{domain}'은 위 SSL설정의 'server_name'에 지정한 {본인ID}.{VM Public IP}.nip.io을 사용합니다.  
+  ```
+  sudo certbot --nginx -d {domain}
+  ```
+  결과 예시)
+  ```
+  azureuser@dg0100-bastion:/etc/nginx/sites-available$ sudo certbot --nginx -d dg0100.4.217.252.231.nip.io
+  Saving debug log to /var/log/letsencrypt/letsencrypt.log
+  Enter email address (used for urgent renewal and security notices)
+  (Enter 'c' to cancel): hiondal@gmail.com
+
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  Please read the Terms of Service at
+  https://letsencrypt.org/documents/LE-SA-v1.4-April-3-2024.pdf. You must agree in
+  order to register with the ACME server. Do you agree?
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  (Y)es/(N)o: Y
+
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  Would you be willing, once your first certificate is successfully issued, to
+  share your email address with the Electronic Frontier Foundation, a founding
+  partner of the Let's Encrypt project and the non-profit organization that
+  develops Certbot? We'd like to send you email about our work encrypting the web,
+  EFF news, campaigns, and ways to support digital freedom.
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  (Y)es/(N)o: Y  
+  Account registered.
+  Requesting a certificate for dg0100.4.217.252.231.nip.io
+
+  Successfully received certificate.
+  Certificate is saved at: /etc/letsencrypt/live/dg0100.4.217.252.231.nip.io/fullchain.pem
+  Key is saved at:         /etc/letsencrypt/live/dg0100.4.217.252.231.nip.io/privkey.pem
+  This certificate expires on 2025-05-01.
+  These files will be updated when the certificate renews.
+  Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+  Deploying certificate
+  Could not install certificate
+
+  NEXT STEPS:
+  - The certificate was saved, but could not be installed (installer: nginx). After fixing the error shown below, try installing it again by running:
+    certbot install --cert-name dg0100.4.217.252.231.nip.io
+
+  Could not automatically find a matching server block for dg0100.4.217.252.231.nip.io. Set the `server_name` directive to use the Nginx installer.
+  Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
+  ```
+
+- nginx 설정 수정  
+
   ```
   sudo vi /etc/nginx/sites-available/default 
   ```
 
-  기존 설정에 아래 설정을 추가합니다.  
+  기존 설정에 SSL 설정을 추가합니다.  
   'server_name'은 {본인ID}.{VM Public IP}.nip.io로 지정합니다.  
   'location' 섹션은 proxying을 위한 설정입니다. 이는 나중에 사용하니 아래 내용을 그대로 사용합니다.  
   ```
   server {
+      listen 80;
+      server_name _;
+      root /var/www/html;
+      index index.html;
+      location / {
+          try_files $uri $uri/ =404;
+      }
+  }
+
+  server {
       listen 443 ssl;
       server_name dg0100.4.217.252.231.nip.io;
+      ssl_certificate /etc/letsencrypt/live/dg0100.4.217.252.231.nip.io/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/dg0100.4.217.252.231.nip.io/privkey.pem;
+      root /var/www/html;
+      index index.html;
+
+      # Proxying
       ssl_protocols TLSv1.2 TLSv1.3;
       ssl_ciphers HIGH:!aNULL:!MD5;
       location / {
@@ -750,21 +825,6 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   }
   ```
 
-- 정식 SSL 인증서 받기  
-  인증서 생성 프로그램 설치  
-  ```
-  sudo apt update
-  sudo apt install snapd
-  sudo snap install --classic certbot
-  sudo ln -s /snap/bin/certbot /usr/bin/certbot
-  ```
- 
-- 인증서 만들기  
-  '{domain}'은 위 SSL설정의 'server_name'에 지정한 {본인ID}.{VM Public IP}.nip.io을 사용합니다.  
-  ```
-  sudo certbot --nginx -d {domain}
-  ```
-
 - nginx 서버 재시작  
   ```
   sudo nginx -t
@@ -772,7 +832,9 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
 
 - 테스트  
-   웹브라우저에서 'https://{VM Public IP}'로 접근하여 정상적으로 표시되는지 확인합니다.    
+  웹브라우저에서 'https://{domain}'로 접근하여 정상적으로 표시되는지 확인합니다.    
+  ![](images/2025-02-01-05-43-49.png)  
+
 
 | [Top](#목차) |
 
