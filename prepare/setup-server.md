@@ -80,6 +80,8 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 'Microsoft.ContainerService'를 등록합니다.  
 ![](images/2025-01-31-11-10-43.png)  
 
+'Microsoft.Storage'룰 등록합니다.  
+
 | [Top](#목차) |
 
 ---
