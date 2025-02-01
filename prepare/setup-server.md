@@ -321,7 +321,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   - NSG(Network Security Group)
     - 각 Subnet에 적용하는 Inboud/Outbound 정책을 설정하는 리소스  
 
-- HOW
+- HOW  
   아래 예와 같이 Resource Group > VNET > Subnet > NIC의 계층적 구조로 만들어집니다.  
   NIC는 Subnet에서 하나의 IP를 부여 받아 VM에 할당하게 됩니다.  
   NSG는 Subnet에 적용되어 inbound/outbound 통신을 제어합니다.   
