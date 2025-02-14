@@ -527,7 +527,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   az network vnet subnet show -n ${PUB_SNET} --vnet-name $VNET
   ```
 
-  Public Subnet의 NSG를 연결된 아래와 같이 변경합니다.  
+  Public Subnet에 연결된 NSG를 아래와 같이 Bastion서버의 NSG로 변경합니다.  
   ```
   az network vnet subnet update \
   -n ${PUB_SNET} \
