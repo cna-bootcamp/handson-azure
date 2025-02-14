@@ -17,6 +17,7 @@
   - [Bastion VM 생성](#bastion-vm-생성)
   - [nginx 서버 설치](#nginx-서버-설치)
   - [SSL 설정](#ssl-설정)
+  - [AKS Node pool 추가](#aks-node-pool-추가)
 
 > 실습환경에서는 Azure 구독, 리소스 프로바이더 등록, 리소스 그룹 생성은 이미 되어 있으므로 할 필요 없습니다.   
 > 리소스 그룹명은 Azure포탈(https://portal.azure.com)에서 확인합니다.    
@@ -340,21 +341,31 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   export ADDR_PREFIX=10.17.0
   export VNET=${ID}-vnet  
   export NSG=${ID}-nsg
-  export PUB_SNET=${ID}-pub-snet
-  export PRI_SNET=${ID}-pri-snet
-  export PE_SNET=${ID}-pe-snet
-  export PSQL_SNET=${ID}-psql-snet
+  export PUB_SNET=${VNET}-pub-snet
+  export PRI_SNET=${VNET}-pri-snet
+  export PE_SNET=${VNET}-pe-snet
+  export PSQL_SNET=${VNET}-psql-snet
   ```
 
 - 기존 생성 객체 확인  
   실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
+  단, VNET과 NSG변수값은 바꾸십시오.  
   ```
   az network vnet list -o table
+  ```
+  위 결과를 보고 VNET 변수 값을 변경 합니다.   
+
+  ```
   az network nsg list -o table
+  ```
+  위 결과를 보고 NSG 변수 값을 변경 합니다.  
+
+  ```
   az network vnet subnet list --vnet-name ${VNET} -o table
   ```
 
 - VNET 생성  
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.   
   주소 공간은 모든 서브넷을 포함할 수 있도록 지정해야 합니다.  
   주소 공간은 private ip 대역대인 10, 172, 192로 시작해야 합니다.  
   슬래쉬 뒤의 값은 IP의 갯수를 의미합니다. 갯수를 계산하는 공식은 2^(32-{지정값})입니다.  
@@ -368,6 +379,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   ```
 
 - NSG 생성
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
   ```
   # NSG(Network Security Group) 생성  
   az network nsg create -n ${NSG}
@@ -377,6 +389,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   ```
 
 - SNET 생성  
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
   각 목적별로 Subnet 객체를 생성합니다.  
   - 퍼블릭 서브넷(pub-snet)
     - 외부와 직접 통신이 필요한 서비스 배치
@@ -518,7 +531,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
   az network vnet subnet update \
   -n ${PUB_SNET} \
-  --vnet-name ${ID}-vnet \
+  --vnet-name ${VNET} \
   --network-security-group ${ID}-bastionNSG
   ```
 
@@ -843,3 +856,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
 ---
 
+## AKS Node pool 추가 
+
+
+![](images/2025-02-06-19-06-47.png)
