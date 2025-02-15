@@ -596,14 +596,9 @@ az vm show -d -n ${ID}-bastion --query publicIps -o tsv
 ```
 
 VM 생성 시 자동으로 ~/.ssh 디렉토리에 ssh key가 생성됩니다.  
-그 파일의 내용을 복사합니다.  
-```
-cd ~/.ssh
-cat id_rsa
-```
-
-내용을 복사하여 c:\home 디렉토리에 sshkey라는 파일을 만들고 내용을 붙여넣습니다.  
+그 파일을 c:\home 디렉토리에 sshkey라는 파일로 다운로드 합니다.    
 (디렉토리나 파일명은 사실 아무거나 상관 없습니다.)   
+![](images/2025-02-16-05-20-27.png)  
 
 SSH 세션을 작성합니다.  
 ![](images/2025-02-16-05-09-02.png)  
