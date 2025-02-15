@@ -15,6 +15,7 @@
   - [VNET Peering](#vnet-peering)
   - [Azure 서비스에 VNET/Subnet 연결](#azure-서비스에-vnetsubnet-연결)
   - [Bastion VM 생성](#bastion-vm-생성)
+  - [Docker설치](#docker설치)
   - [nginx 서버 설치](#nginx-서버-설치)
   - [SSL 설정](#ssl-설정)
   - [AKS Node pool 추가](#aks-node-pool-추가)
@@ -437,6 +438,14 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   az network vnet subnet list --vnet-name ${VNET} -o table 
   ```
 
+  > 참고 : Subnet에 연결된 NSG 변경  
+  > ```
+  > az network vnet subnet update \
+  > -n ${PUB_SNET} \
+  > --vnet-name ${VNET} \
+  > --network-security-group ${ID}-bastionNSG
+  > ```
+
 - 기존 서브넷의 주소 공간과 사용량 확인
   ```
   # 서브넷 상세 정보 확인
@@ -513,13 +522,13 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
 - Public subnet 생성  
   ```
-  ID={본인ID}  #예: dg0200
-  ID_NUM=${ID: -2}  #마지막 2자리 구함
+  ID={본인ID}
+  ID_NUM=${ID: -2}
   export MY_PUB_SNET=${ID}-pub-snet
   
-  az network vnet subnet create 
-  --name ${MY_PUB_SNET} 
-  --vnet-name ${VNET} 
+  az network vnet subnet create \
+  --name ${MY_PUB_SNET} \
+  --vnet-name ${VNET} \
   --address-prefixes 10.0.2${ID_NUM}.0/28  
   ```
 
@@ -578,8 +587,18 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
   ```
 
-- Docker설치   
-  필요한 패키지 설치
+## Docker설치   
+- VM 접속    
+  ```
+  # VM의 Public IP 확인
+  az vm show -d -n ${ID}-bastion --query publicIps -o tsv
+  ```
+
+  ```
+  ssh azureuser@{공용 IP 주소}
+  ```
+
+- 필요한 패키지 설치
   ```
   sudo apt-get update
   sudo apt-get install -y \
@@ -602,7 +621,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   ```
 
-  Docker 엔진 설치
+- Docker 엔진 설치
   ```
   sudo apt-get update
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
@@ -618,26 +637,17 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   sudo service docker start
   ```
 
-  터미널을 닫고 새 터미널에서 version확인 
+- 터미널을 닫고 새 터미널에서 version확인 
   ```
   docker version 
   ```
-  
+
 | [Top](#목차) |
 
 ---
 
 ## nginx 서버 설치  
-- VM 접속    
-  ```
-  # VM의 Public IP 확인
-  az vm show -d -n ${ID}-bastion --query publicIps -o tsv
-  ```
-
-  ```
-  ssh azureuser@{공용 IP 주소}
-  ```
-
+Bastion VM에서 수행합니다.  
 - Nginx 설치
 
   ```
@@ -782,7 +792,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 | [Top](#목차) |
 
 ---
-
+Bastion VM에서 수행합니다.  
 ## SSL 설정  
 
 - 정식 SSL 인증서 받기  
