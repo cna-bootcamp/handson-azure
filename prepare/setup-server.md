@@ -582,6 +582,20 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   --destination-port-ranges $PORT
   ```
   
+  ```
+  # 18080 포트 오픈: 마이구독서비스에서 사용  
+  export PORT=18080  
+  az network nsg rule create \
+  --nsg-name ${ID}-bastionNSG \
+  --name Allow-HTTP-$PORT \
+  --priority 300 \
+  --access Allow \
+  --direction Inbound \
+  --protocol Tcp \
+  --source-port-ranges '*' \
+  --destination-port-ranges $PORT
+  ```
+  
   rule 확인  
   ```
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
