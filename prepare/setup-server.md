@@ -504,6 +504,25 @@ az network application-gateway create \
 AKS 접근을 위한 bastion서버와 nginx 서버 설치를 위해 VM을 생성합니다.  
 bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통해 접근하기 위한 Gateway역할 서버입니다.  
 
+- VNET과 Public Subnet을 확인  
+  아래 명령으로 VNET값을 확인하고 VNET과 Public Subnet변수에 지정    
+  ```
+  az network vnet list -o table
+  export VNET={VNET}
+  ```   
+
+- Public subnet 생성  
+  ```
+  ID={본인ID}  #예: dg0200
+  ID_NUM=${ID: -2}  #마지막 2자리 구함
+  export MY_PUB_SNET=${ID}-pub-snet
+  
+  az network vnet subnet create 
+  --name ${MY_PUB_SNET} 
+  --vnet-name ${VNET} 
+  --address-prefixes 10.0.2${ID_NUM}.0/28  
+  ```
+
 - VM 생성
   Public Subnet에 연결합니다.  
   Size는 1Core/1GB의 가장 낮은 사양인 'Standard_B1s'로 지정합니다.  
@@ -514,26 +533,12 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --admin-username azureuser \
     --generate-ssh-keys \
     --vnet-name ${VNET} \
-    --subnet ${PUB_SNET} \
+    --subnet ${MY_PUB_SNET} \
     --size Standard_B1s
   ```
 
   아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
   ![](images/2025-02-01-03-32-16.png)  
-
-- Subnet에 자동 생성된 NSG 연결  
-  현재 연결된 NSG를 확인합니다.  'networkSecurityGroup' 항목에서 확인할 수 있습니다.  
-  ```
-  az network vnet subnet show -n ${PUB_SNET} --vnet-name $VNET
-  ```
-
-  Public Subnet에 연결된 NSG를 아래와 같이 Bastion서버의 NSG로 변경합니다.  
-  ```
-  az network vnet subnet update \
-  -n ${PUB_SNET} \
-  --vnet-name ${VNET} \
-  --network-security-group ${ID}-bastionNSG
-  ```
 
 - PORT 오픈   
   생성된 NSG의 포트를 오픈 합니다.  
@@ -573,6 +578,51 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
   ```
 
+- Docker설치   
+  필요한 패키지 설치
+  ```
+  sudo apt-get update
+  sudo apt-get install -y \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+  ```
+
+  Docker GPG key 추가
+  ```
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  ```
+
+  Docker repository 설정
+  ```
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  ```
+
+  Docker 엔진 설치
+  ```
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  ```
+
+  현재 사용자를 docker 그룹에 추가 (sudo 없이 docker 명령어 사용 가능)
+  ```
+  sudo usermod -aG docker $USER
+  ```
+
+  Docker 서비스 시작
+  ```
+  sudo service docker start
+  ```
+
+  터미널을 닫고 새 터미널에서 version확인 
+  ```
+  docker version 
+  ```
+  
 | [Top](#목차) |
 
 ---
