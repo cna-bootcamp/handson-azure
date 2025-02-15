@@ -534,7 +534,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
 
 - VM 생성
   Public Subnet에 연결합니다.  
-  Size는 1Core/1GB의 가장 낮은 사양인 'Standard_B1s'로 지정합니다.  
+  Size는 2Core/4GB의 사양인 'Standard_B2s'로 지정합니다.  
   ```
   az vm create \
     -n ${ID}-bastion \
@@ -543,7 +543,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --generate-ssh-keys \
     --vnet-name ${VNET} \
     --subnet ${MY_PUB_SNET} \
-    --size Standard_B1s
+    --size Standard_B2s
   ```
 
   아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
