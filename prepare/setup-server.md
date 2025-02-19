@@ -668,6 +668,27 @@ VM 접속이 되는지 테스트 합니다.
   docker version 
   ```
 
+- buildx 설치 
+  buildx는 Docker CLI의 플러그인으로, 컨테이너 이미지 빌드 기능을 확장합니다.  
+  설치 안해도 되지만 안하면 Image build 시 경고 메시지가 나와 설치하는게 좋습니다.  
+  
+  ```
+  wget https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.linux-amd64
+  ```
+
+  plugins 디렉토리 생성 및 buildx 설치
+  ```bash
+  mkdir -p ~/.docker/cli-plugins
+  mv buildx-v0.12.1.linux-* ~/.docker/cli-plugins/docker-buildx
+  chmod +x ~/.docker/cli-plugins/docker-buildx
+  ```
+
+  설치 확인
+  ```bash
+  docker buildx version
+  ```
+
+
 | [Top](#목차) |
 
 ---
