@@ -544,7 +544,19 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --generate-ssh-keys \
     --vnet-name ${VNET} \
     --subnet ${MY_PUB_SNET} \
-    --size Standard_B2s
+    --size Standard_DS2_v3
+  ```
+  
+  만약, 안돼면 아래와 같이 size를 다른 걸로 변경해 보세요.   
+  ```
+  az vm create \
+    -n ${ID}-bastion \
+    --image Ubuntu2204 \
+    --admin-username azureuser \
+    --generate-ssh-keys \
+    --vnet-name ${VNET} \
+    --subnet ${MY_PUB_SNET} \
+    --size Standard_DS2_v2
   ```
 
   아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
