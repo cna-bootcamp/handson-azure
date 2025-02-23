@@ -318,6 +318,49 @@ MobaXTerm을 실행하고 새로운 SSH세션 작성을 합니다.
 **로컬 ubuntu에서 수행**합니다.  
 VM설치한 분은 VM에서 수행합니다.  
 
+- Azure CLI 설치    
+  ```
+  # 1. Microsoft 서명 키 추가
+  curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
+  # 2. Azure CLI 저장소 추가
+  AZ_REPO=$(lsb_release -cs)
+  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+  # 3. 패키지 리스트 업데이트 및 설치
+  sudo apt-get update
+  sudo apt-get install azure-cli
+  ```
+
+- Azure Login   
+  아래 명령 수행 후 나오는 URL을 브라우저에서 접근하여 URL옆에 있는 코드를 입력하여 로그인 합니다.  
+  로그인 후 콘솔로 돌아오면 Subscription선택하는 화면이 나옵니다.  
+  Subscription 번호를 입력하여 로그인을 완료 합니다.     
+  ```
+  az login --use-device-code
+  ```
+  주의) MobaXTerm에서 수행 시 복사를 위해 CTRL-C를 누르면 수행이 중단됩니다. 드래그만 해도 복사가 됩니다.   
+
+- Azure 전역 설정    
+  명령어에서 반복적으로 사용할 Resource Group과 Location값을 기본 설정에 셋팅합니다.   
+  Azure resource group을 확인합니다.  
+  ```
+  az group list -o table
+  ```
+
+  ```
+  az configure -d group={리소스그룹} location={Location}
+  ```
+  예시)
+  ```
+  az configure -d group=tiu-dgga-rg location=koreacentral
+  ```
+
+  설정된 값을 확인합니다.
+  ```
+  az configure -l -o table
+  ```
+
 - kubectl 설치 
   ```
   sudo snap install kubectl --classic

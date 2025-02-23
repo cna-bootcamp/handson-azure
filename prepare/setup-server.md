@@ -171,6 +171,11 @@ az login --tenant {tenant id}
 
 ## 기본 configuration 셋팅
 명령어에서 반복적으로 사용할 Resource Group과 Location값을 기본 설정에 셋팅합니다.   
+Azure resource group을 확인합니다.  
+```
+az group list -o table
+```
+
 ```
 az configure -d group={리소스그룹} location={Location}
 ```
