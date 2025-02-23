@@ -6,10 +6,7 @@
   - [작업 디렉토리 생성](#작업-디렉토리-생성)
   - [NotePad++ 설치(Windows Only)](#notepad-설치windows-only)
   - [MobaXTerm 설치(Windows Only)](#mobaxterm-설치windows-only)
-    - [설치하기](#설치하기)
-    - [설정하기](#설정하기)
   - [로컬 ubuntu 설치](#로컬-ubuntu-설치)
-    - [필요 툴 설치](#필요-툴-설치)
   - [JDK 설치](#jdk-설치)
   - [IntelliJ 설치](#intellij-설치)
   - [Docker 설치](#docker-설치)
@@ -54,7 +51,7 @@ mkdir -p ~/home/workspace
 MobaXTerm을 쓰는 이유는 첫째 Window에서도 Linux명령을 사용하기 위해서고,  
 둘째 서버 접속 후 서버의 파일을 쉽게 편집하기 위해서입니다.  
 
-### 설치하기 
+**1)설치하기** 
 - 사이트 접근  
 [다운로드 페이지](http://mobaxterm.mobatek.net/download.html)를 접근합니다.  
 - 설치파일 다운로드
@@ -79,7 +76,7 @@ Home Edition 아래에 있는 [Download now]를 클릭합니다.
 자주 사용할 프로그램이므로 작업표시줄에 고정시킵니다.   
 ![](images/2025-02-23-18-49-46.png)  
 
-### 설정하기 
+**2)설정하기** 
 - 윈도우에 작업Home 디렉토리 만들기  
 앞으로 모든 실습을 위한 Home디렉토리를 만듭니다.  
 작업Home디렉토리의 이름은 'home'으로 통일합니다.  
@@ -105,6 +102,7 @@ MobaXTerm은 저장소로 임시공간을 사용합니다.
 ## 로컬 ubuntu 설치    
 Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니다. 
 
+**1)설치하기**
 - Powershell을 관리자 권한으로 실행   
   ![](images/2025-02-23-18-52-19.png)  
 
@@ -267,11 +265,7 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
   ll ~
   ```
 
-| [Top](#목차) |
-
----
-
-### 필요 툴 설치 
+**2)필요 툴 설치** 
 
 - Azure CLI 설치    
   ```
