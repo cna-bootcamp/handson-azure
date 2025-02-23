@@ -9,8 +9,7 @@
     - [설치하기](#설치하기)
     - [설정하기](#설정하기)
     - [로컬 ubuntu 사용 설정](#로컬-ubuntu-사용-설정)
-    - [Remote VM 설치(로컬 ubuntu 설치 실패 시)](#remote-vm-설치로컬-ubuntu-설치-실패-시)
-    - [로컬 ubuntu 또는 Remote VM에 툴 설치](#로컬-ubuntu-또는-remote-vm에-툴-설치)
+    - [필요 툴 설치](#필요-툴-설치)
   - [JDK 설치](#jdk-설치)
   - [IntelliJ 설치](#intellij-설치)
   - [Docker 설치](#docker-설치)
@@ -268,55 +267,7 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
 
 ---
 
-### Remote VM 설치(로컬 ubuntu 설치 실패 시)
-Azure Portal에 로그인 하여 아래 그림들처럼 VM을 생성하세요.  
-
-![](./images/2025-02-18-12-44-45.png)    
-
-![](./images/2025-02-18-12-45-46.png)  
-
-![](./images/2025-02-18-12-46-07.png)  
-
-**Virtual machine name**은 {본인 ID}-bastion으로 지정하세요.   
-본인 ID는 아래 링크에 있습니다.   
-https://docs.google.com/document/d/1Qp8s7P1VYwVZDHsRdGIpyl0V6bO-xmu4IRq8dG0oAdU/edit?tab=t.0#heading=h.mxfk5mq4cq9m   
-
-![](./images/2025-02-18-12-46-47.png)   
-
-![](./images/2025-02-18-12-47-11.png)
-
-
-하단의 'Review + Create'버튼 클릭하고, 그 다음 페이지에서 'Create'버튼 클릭 하세요.   
-![](./images/2025-02-18-12-49-55.png)   
-
-'C:\home' 디렉토리에 다운로드 합니다.  
-![](./images/2025-02-18-12-50-43.png)
-
-
-VM 생성 완료를 기다립니다.   
-![](./images/2025-02-18-12-53-21.png)  
-
-IP를 복사합니다.  
-![](./images/2025-02-18-12-53-57.png)  
-
-
-MobaXTerm을 실행하고 새로운 SSH세션 작성을 합니다.  
-![](./images/2025-02-18-12-52-07.png)
-
-![](./images/2025-02-18-12-55-07.png)  
-
-![](./images/2025-02-18-12-55-52.png)  
-
-![](./images/2025-02-18-12-56-50.png) 
-
-
-| [Top](#목차) |
-
----
-
-### 로컬 ubuntu 또는 Remote VM에 툴 설치 
-**로컬 ubuntu에서 수행**합니다.  
-VM설치한 분은 VM에서 수행합니다.  
+### 필요 툴 설치 
 
 - Azure CLI 설치    
   ```
