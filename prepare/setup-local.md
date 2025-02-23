@@ -20,7 +20,9 @@
 
 ## 작업 디렉토리 생성
 {사용자 홈}하위에 'home/workspace'로 만듭니다.    
-Windows는 탐색기 또는 DOS창에서 만듭니다.  
+Windows는 Power Shell에서 만듭니다.  
+![](images/2025-02-23-19-14-59.png)  
+
 Mac은 Terminal에서 아래 명령으로 만듭니다.  
 ```
 mkdir -p ~/home/workspace
@@ -77,10 +79,6 @@ Home Edition 아래에 있는 [Download now]를 클릭합니다.
 ![](images/2025-02-23-18-49-46.png)  
 
 **2)설정하기** 
-- 윈도우에 작업Home 디렉토리 만들기  
-앞으로 모든 실습을 위한 Home디렉토리를 만듭니다.  
-작업Home디렉토리의 이름은 'home'으로 통일합니다.  
-![](images/2025-02-23-18-50-04.png)  
   
 - 영구저장 디렉토리 설정  
 MobaXTerm은 저장소로 임시공간을 사용합니다.  
