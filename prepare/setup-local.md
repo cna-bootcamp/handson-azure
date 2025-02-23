@@ -270,7 +270,8 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
   ![](images/2025-02-23-18-55-03.png)  
   ![](images/2025-02-23-18-55-10.png)  
 
-
+  아래 명령을 수행하여 마운트합니다.  
+  'C:\home\workspace' 디렉토리가 Ubuntu의 '~/workspace'로 마운트 되어야 합니다.  
   ```
   mkdir ~/workspace
 
@@ -279,6 +280,14 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
 
   ll ~
   ```
+
+  마운트가 제대로 되었는지 테스트 합니다.   
+  ```
+  touch hi
+  ```
+
+  위 명령 수행 후 윈도우 탐색기에서 c:\home\workspace에 'hi'라는 파일이 생겼는지 확인합니다.   
+  
 
 **2)필요 툴 설치** 
 
@@ -347,7 +356,7 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
 
   맨 끝에 alias k=kubectl 추가 
   ![](images/2025-02-23-19-21-12.png)  
-    
+
 - kubens 설치
   아래 링크에서 소스 복사   
   https://github.com/ahmetb/kubectx/blob/master/kubens
