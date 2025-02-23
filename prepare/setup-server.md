@@ -620,7 +620,8 @@ VM 접속이 되는지 테스트 합니다.
 ## 필요 툴 설치  
 
 아래 링크를 참조하여 필요한 툴을 설치하세요.  
-https://github.com/cna-bootcamp/handson-azure/blob/main/prepare/setup-local.md#%EB%A1%9C%EC%BB%AC-ubuntu-%EB%98%90%EB%8A%94-remote-vm%EC%97%90-%ED%88%B4-%EC%84%A4%EC%B9%98
+https://github.com/cna-bootcamp/handson-azure/blob/main/prepare/setup-local.md#ubuntu%EC%97%90-%ED%95%84%EC%9A%94-%ED%88%B4-%EC%84%A4%EC%B9%98
+
 
 
 | [Top](#목차) |
