@@ -556,7 +556,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --generate-ssh-keys \
     --vnet-name ${VNET} \
     --subnet ${MY_PUB_SNET} \
-    --size Standard_DS2_v2
+    --size Standard_B2s
   ```
 
   아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
@@ -600,7 +600,9 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
   ```
 
+| [Top](#목차) |
 
+---
 
 ## MobaXTerm 세션 작성  
 
