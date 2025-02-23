@@ -661,10 +661,9 @@ Database를 관리하고 SQL로 테이블과 데이터를 처리할 수 있습�
   - 설치파일 다운로드: [설치파일 다운로드](https://dbeaver.io/download/) 링크를 열어 OS에 맞는 파일을 다운로드    
   - 파일을 실행하여 설치합니다. 기본 옵션 그대로 설치합니다.   
 - 테스트   
-  - DBeaver를 실행합니다.   
+  - DBeaver를 실행합니다.  최초 실행 시 Connection생성 창은 닫으세요.   
     ![](images/2025-02-23-19-03-09.png)  
-    ![](images/2025-02-23-19-03-30.png)  
-    ![](images/2025-02-23-19-03-44.png)           
+          
 
   - 테스트로 MySQL Database를 컨테이너로 실행합니다.  
     Windows 사용자는 MobaXTerm, Mac사용자는 터미널에서 실행     
