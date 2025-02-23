@@ -400,7 +400,7 @@ VM설치한 분은 VM에서 수행합니다.
   아래 링크에서 소스 복사   
   https://github.com/ahmetb/kubectx/blob/master/kubens
 
-  ![](./images/2025-02-18-13-48-09.png)  
+  ![](images/2025-02-23-18-42-20.png)  
   
  
   ```
