@@ -249,7 +249,10 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
   아래 명령 실행 후 workspace 마운트 설정 추가 
   ```
   sudo vi /etc/fstab
-
+  ```
+  
+  아래 내용을 붙여 넣습니다.  
+  ```
   /mnt/c/home/workspace /home/ubuntu/workspace none bind 0 0
   ``` 
   > Tip: vi 사용이 힘들면 기본 에디터로 열어 수정 하십시오.    
