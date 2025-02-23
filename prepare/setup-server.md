@@ -16,7 +16,7 @@
   - [Azure 서비스에 VNET/Subnet 연결](#azure-서비스에-vnetsubnet-연결)
   - [Bastion VM 생성](#bastion-vm-생성)
   - [MobaXTerm 세션 작성](#mobaxterm-세션-작성)
-  - [Docker설치](#docker설치)
+  - [필요 툴 설치](#필요-툴-설치)
   - [nginx 서버 설치](#nginx-서버-설치)
   - [SSL 설정](#ssl-설정)
   - [AKS Node pool 추가](#aks-node-pool-추가)
@@ -600,6 +600,8 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
   ```
 
+
+
 ## MobaXTerm 세션 작성  
 
 VM의 IP를 구합니다.  
@@ -620,73 +622,10 @@ SSH 세션을 작성합니다.
 
 VM 접속이 되는지 테스트 합니다.  
 
-## Docker설치   
-- VM 접속    
-  위에서 만든 SSH 세션을 눌러 VM에 로그인 합니다.  
+## 필요 툴 설치  
 
-- 필요한 패키지 설치
-  ```
-  sudo apt-get update
-  sudo apt-get install -y \
-      ca-certificates \
-      curl \
-      gnupg \
-      lsb-release
-  ```
-
-  Docker GPG key 추가
-  ```
-  sudo mkdir -p /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  ```
-
-  Docker repository 설정
-  ```
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  ```
-
-- Docker 엔진 설치
-  ```
-  sudo apt-get update
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-  ```
-
-  현재 사용자를 docker 그룹에 추가 (sudo 없이 docker 명령어 사용 가능)
-  ```
-  sudo usermod -aG docker $USER
-  ```
-
-  Docker 서비스 시작
-  ```
-  sudo service docker start
-  ```
-
-- 터미널을 닫고 새 터미널에서 version확인 
-  ```
-  docker version 
-  ```
-
-- buildx 설치   
-  buildx는 Docker CLI의 플러그인으로, 컨테이너 이미지 빌드 기능을 확장합니다.  
-  설치 안해도 되지만 안하면 Image build 시 경고 메시지가 나와 설치하는게 좋습니다.  
-
-  ```
-  wget https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.linux-amd64
-  ```
-
-  plugins 디렉토리 생성 및 buildx 설치
-  ```bash
-  mkdir -p ~/.docker/cli-plugins
-  mv buildx-v0.12.1.linux-* ~/.docker/cli-plugins/docker-buildx
-  chmod +x ~/.docker/cli-plugins/docker-buildx
-  ```
-
-  설치 확인
-  ```bash
-  docker buildx version
-  ```
+아래 링크를 참조하여 필요한 툴을 설치하세요.  
+https://github.com/cna-bootcamp/handson-azure/blob/main/prepare/setup-local.md#%EB%A1%9C%EC%BB%AC-ubuntu-%EB%98%90%EB%8A%94-remote-vm%EC%97%90-%ED%88%B4-%EC%84%A4%EC%B9%98
 
 
 | [Top](#목차) |
