@@ -7,6 +7,7 @@
   - [NotePad++ 설치(Windows Only)](#notepad-설치windows-only)
   - [MobaXTerm 설치(Windows Only)](#mobaxterm-설치windows-only)
   - [로컬 ubuntu 설치](#로컬-ubuntu-설치)
+  - [Ubuntu에 필요 툴 설치](#ubuntu에-필요-툴-설치)
   - [JDK 설치](#jdk-설치)
   - [IntelliJ 설치](#intellij-설치)
   - [Docker 설치](#docker-설치)
@@ -100,7 +101,6 @@ MobaXTerm은 저장소로 임시공간을 사용합니다.
 ## 로컬 ubuntu 설치    
 Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니다. 
 
-**1)설치하기**
 - Powershell을 관리자 권한으로 실행   
   ![](images/2025-02-23-18-52-19.png)  
 
@@ -288,8 +288,11 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
 
   위 명령 수행 후 윈도우 탐색기에서 c:\home\workspace에 'hi'라는 파일이 생겼는지 확인합니다.   
   
+| [Top](#목차) |
 
-**2)필요 툴 설치** 
+---
+
+## Ubuntu에 필요 툴 설치 
 
 - Azure CLI 설치    
   ```
