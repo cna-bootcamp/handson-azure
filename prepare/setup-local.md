@@ -632,29 +632,19 @@ Node.js Runtime엔진을 설치합니다.
   DOS창에서 아래 명령을 입력하십시오.   
   이걸 해야 하는 이유는 전역모듈 설치의 기본 경로가 '{사용자 홈}\AppData\Roaming\npm'으로 되어 있어   
   파일 권한 때문에 에러가 날 수도 있기 때문입니다.   
+  MS-DOS창에서 아래를 수행 하세요.   
   ```
-  mkdir ~/mypackages 
-  npm config set prefix "c:\home\mypackages"
-  npm config set cache "c:\home\mypackages\npm-cache"  
-  ```
-  그리고 PATH에 c:\home\mypackages 를 추가합니다.   
-  PATH 추가하는 방법은 JDK경로 설정할 때 했던 것을 참고하세요.  
-
-- 테스트 
-  Local Ubuntu 에서 테스트 합니다.  
-  - 작업디렉토리로 이동     
-  ```
-  cd ~/workspace 
-  ```
-  > **작업디렉토리를 안 만들었으면 생성**   
-  > '~'는 사용자 홈디렉토리를 의미   
-  > -p 옵션은 이미 디렉토리가 있으면 에러 내지말고 종료하라는 의미   
-  ```
-  mkdir -p ~/workspace 
-  cd ~/workspace  
+  mkdir c:\home\workspace\mypackages 
+  npm config set prefix "c:\home\workspace\mypackages"
+  npm config set cache "c:\home\workspace\mypackages"  
   ```
   
-  아래 명령 입력 시 에러 안나면 잘 설치 된겁니다.  
+  그리고 PATH에 'c:\home\workspace\mypackages' 를 추가합니다.   
+  PATH 추가하는 방법은 JDK경로 설정할 때 했던 것을 참고하세요.  
+  ![](images/2025-02-23-19-41-01.png)  
+
+- 테스트 
+  DOS창에서 아래 명령 입력 시 에러 안나면 잘 설치 된겁니다.  
   ```
   npm -v
   ```
