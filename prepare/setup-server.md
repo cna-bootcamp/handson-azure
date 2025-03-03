@@ -223,7 +223,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   > ```
   > 
   > 제일 많이 사용하는 VM Size type(마지막 컬럼의 비용은 월 사용비용임)  
-  > **교육시에는 'Standard_B2s'를 사용하고 MVP개발시에는 'Standard_DS3_V2' 사용**   
+  > **교육시에는 'Standard_B2s'를 사용하고 MVP개발시에는 'Standard_DS2_v2' 사용**   
   > ![](images/2025-01-31-11-11-53.png)  
 
   > Tip: **node-osdisk-type**  
