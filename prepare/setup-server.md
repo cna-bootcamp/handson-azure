@@ -338,16 +338,24 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   ![](images/2025-02-01-02-46-27.png)
 
 - 기본 파라미터와 변수 설정  
-  'ID'값은 본인ID로 변경해야 함  
+  Resource Group 을 확인 합니다.     
   ```
-  az configure -l -o table
+  az group list -o table 
+  ```
 
-  export ID=dg0100
-  az configure --defaults group=${ID}-rg location=koreacentral
+  리소스 그룹 변수명을 지정합니다.   
+  예시)     
+  ```
+  export RG=ictcoe-edu
+  ```
+  
+  환경변수를 셋팅합니다.   
+  ```
+  az configure --defaults group=${RG}-rg location=koreacentral
 
   export ADDR_PREFIX=10.17.0
-  export VNET=${ID}-vnet  
-  export NSG=${ID}-nsg
+  export VNET=${RG}-vnet  
+  export NSG=${RG}-nsg
   export PUB_SNET=${VNET}-pub-snet
   export PRI_SNET=${VNET}-pri-snet
   export PE_SNET=${VNET}-pe-snet
@@ -449,7 +457,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   > az network vnet subnet update \
   > -n ${PUB_SNET} \
   > --vnet-name ${VNET} \
-  > --network-security-group ${ID}-bastionNSG
+  > --network-security-group ${RG}-nsg
   > ```
 
 - 기존 서브넷의 주소 공간과 사용량 확인
