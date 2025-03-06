@@ -351,7 +351,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   
   환경변수를 셋팅합니다.   
   ```
-  az configure --defaults group=${RG}-rg location=koreacentral
+  az configure --defaults group=${RG} location=koreacentral
 
   export ADDR_PREFIX=10.17.0
   export VNET=${RG}-vnet  
