@@ -534,16 +534,14 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   export VNET={VNET}
   ```   
 
-- Public subnet 생성  
+- Public subnet 확인 
+  ```
+  az network vnet subnet list --vnet-name $VNET -o table
+  ``` 
+  위 결과에서 끝에 pub-snet으로 끝나는 subnet을 PUB_SNET변수에 지정   
   ```
   ID={본인ID}
-  ID_NUM=${ID: -2}
-  export MY_PUB_SNET=${ID}-pub-snet
-  
-  az network vnet subnet create \
-  --name ${MY_PUB_SNET} \
-  --vnet-name ${VNET} \
-  --address-prefixes 10.0.2${ID_NUM}.0/28  
+  export PUB_SNET={Public Subnet}
   ```
 
 - VM 생성
@@ -556,7 +554,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --admin-username azureuser \
     --generate-ssh-keys \
     --vnet-name ${VNET} \
-    --subnet ${MY_PUB_SNET} \
+    --subnet ${PUB_SNET} \
     --size Standard_B2s
   ```
 
