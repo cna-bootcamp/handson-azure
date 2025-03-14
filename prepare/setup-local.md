@@ -576,18 +576,66 @@ Docker는 컨테이너 이미지를 만들고 실행하는 툴입니다.
   open -a docker
   ```
 
-  Windows 사용자는 아래 가이드대로 설치합니다.  
-  - 설치파일 다운로드: [Docker Desktop 설치](https://docs.docker.com/desktop/install/windows-install/)로 접근하여 다운로드    
-    ![](images/2025-02-23-19-01-26.png)  
+  Ubuntu 설치는 아래와 같이 하세요.   
+  ```
+  # 이전 버전 제거 (이전에 설치된 경우)
+  sudo apt-get remove docker docker-engine docker.io containerd runc
 
-  - 다운로드한 파일을 실행하여 설치: 기본 옵션 그대로 설치   
+  # 필요한 패키지 설치
+  sudo apt-get update
+  sudo apt-get install -y ca-certificates curl gnupg lsb-release
 
+  # Docker의 공식 GPG 키 추가
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+  # 저장소 설정
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  # 패키지 목록 업데이트
+  sudo apt-get update
+
+  # Docker 설치
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+  # 현재 사용자를 docker 그룹에 추가
+  sudo usermod -aG docker $USER
+
+  # 변경사항 적용을 위해 로그아웃 후 다시 로그인하거나 다음 명령어 실행
+  newgrp docker
+  ```
+  
+  > 참고: Windows 설치시에는 아래 가이드대로 설치합니다.  
+  > - 설치파일 다운로드: [Docker Desktop 설치](https://docs.docker.com/desktop/install/windows-install/)로 접근하여 다운로드    
+  > ![](images/2025-02-23-19-01-26.png)  
+  > - 다운로드한 파일을 실행하여 설치: 기본 옵션 그대로 설치   
+  
 - 테스트 하기
-  - Mac사용자는 터미널을 열고 Windows사용자는 MobaXTerm에서 Local터미널을 엽니다.   
+  - Mac사용자는 터미널을 열고 Windows사용자는 MobaXTerm에서 Local Ubuntu를 엽니다.   
   - Docker version 확인    
     ```
     docker version 
     ```    
+  
+- buildx 설치
+  
+  ```
+  # 최신 Buildx 릴리스 버전 확인
+  BUILDX_VERSION=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+
+  # Buildx 바이너리 다운로드
+  curl -sSL "https://github.com/docker/buildx/releases/download/v${BUILDX_VERSION}/buildx-v${BUILDX_VERSION}.linux-amd64" -o docker-buildx
+
+  # 실행 권한 부여
+  chmod +x docker-buildx
+
+  # Docker CLI 플러그인 경로에 복사
+  mkdir -p ~/.docker/cli-plugins
+  mv docker-buildx ~/.docker/cli-plugins/docker-buildx
+
+  # 설치 확인
+  docker buildx version
+  ```
 
 | [Top](#목차) |
 
