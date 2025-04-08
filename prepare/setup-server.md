@@ -590,6 +590,12 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   ```
 
   NSG에 포트를 오픈 합니다.  
+  이미 되어 있는지 확인합니다.   
+  ```
+  az network nsg rule list --nsg-name ${NSG} -o table
+  ```
+
+  80,443 포트 오픈이 안되어 있으면 추가합니다.   
   'priority'는 100~4096사이의 값으로 중복되지 않게 지정합니다.  
   
   ```
