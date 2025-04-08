@@ -12,8 +12,7 @@
   - [기본 configuration 셋팅](#기본-configuration-셋팅)
   - [AKS/ACR 생성, 삭제](#aksacr-생성-삭제)
   - [VNET,NSG,SNET 생성](#vnetnsgsnet-생성)
-  - [VNET Peering](#vnet-peering)
-  - [Azure 서비스에 VNET/Subnet 연결](#azure-서비스에-vnetsubnet-연결)
+  - [참고](#참고)
   - [Bastion VM 생성](#bastion-vm-생성)
   - [MobaXTerm 세션 작성](#mobaxterm-세션-작성)
   - [필요 툴 설치](#필요-툴-설치)
@@ -334,7 +333,11 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
 - HOW  
   아래 예와 같이 Resource Group > VNET > Subnet > NIC의 계층적 구조로 만들어집니다.  
   NIC는 Subnet에서 하나의 IP를 부여 받아 VM에 할당하게 됩니다.  
-  NSG는 Subnet에 적용되어 inbound/outbound 통신을 제어합니다.   
+  NSG는 Subnet NSG와 NIC NSG로 나누어 관리할 수 있습니다.  
+  Subnet NSG는 Subnet 전체에 적용되어 inbound/outbound 통신을 제어합니다. 
+  NIC NSG는 특정 VM에만 적용됩니다.  
+  특정 VM에 연결되려면 Subnet NSG를 통과하고 NIC NSG도 통과해야 합니다.  
+      
   ![](images/2025-02-01-02-46-27.png)
 
 - 기본 파라미터와 변수 설정  
@@ -352,60 +355,78 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   환경변수를 셋팅합니다.   
   ```
   az configure --defaults group=${RG} location=koreacentral
-
-  export ADDR_PREFIX=10.17.0
-  export VNET=${RG}-vnet  
-  export NSG=${RG}-nsg
-  export PUB_SNET=${VNET}-pub-snet
-  export PRI_SNET=${VNET}-pri-snet
-  export PE_SNET=${VNET}-pe-snet
-  export PSQL_SNET=${VNET}-psql-snet
   ```
-
-- 기존 생성 객체 확인  
+  
+- VNET 생성    
   실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
-  단, VNET과 NSG변수값은 바꾸십시오.  
+  
+  VNET정보를 확인합니다.   
   ```
   az network vnet list -o table
   ```
-  위 결과를 보고 VNET 변수 값을 변경 합니다.   
-
-  ```
-  az network nsg list -o table
-  ```
-  위 결과를 보고 NSG 변수 값을 변경 합니다.  
-
-  ```
-  az network vnet subnet list --vnet-name ${VNET} -o table
-  ```
-
-- VNET 생성  
-  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.   
+  
+  만약 없으면 생성합니다.   
   주소 공간은 모든 서브넷을 포함할 수 있도록 지정해야 합니다.  
   주소 공간은 private ip 대역대인 10, 172, 192로 시작해야 합니다.  
   슬래쉬 뒤의 값은 IP의 갯수를 의미합니다. 갯수를 계산하는 공식은 2^(32-{지정값})입니다.  
   '24'로 지정하면 2^8승이므로 256개의 IP를 지정할 수 있다는 의미입니다.  
+
   ```
+  export ADDR_PREFIX=10.17.0
+
   # VNet 생성
   az network vnet create -n ${VNET} --address-prefix ${ADDR_PREFIX}.0/24
 
   # VNet 확인 
   az network vnet list -o table 
   ```
+  
+  VNET환경변수를 셋팅합니다.   
+  ```
+  export VNET={VNET}
+  ```
 
 - NSG 생성
-  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
-  ```
-  # NSG(Network Security Group) 생성  
-  az network nsg create -n ${NSG}
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.   
 
-  # NSG 확인
+  ```
   az network nsg list -o table
   ```
+  환경변수값을 셋팅합니다.   
+  ```
+  export NSG={NSG}
+  ```
 
-- SNET 생성  
-  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.  
-  각 목적별로 Subnet 객체를 생성합니다.  
+  없으면 생성합니다.   
+  ```  
+  export NSG={NSG}
+  az network nsg create -n ${NSG}
+  ```
+
+- Subnet 생성       
+  실습 환경에서는 이미 모두 생성이 되어 있으므로 확인만 합니다.   
+
+  Subnet를 확인합니다.   
+  ```
+  az network vnet subnet list --vnet-name ${VNET} -o table
+  ```
+
+  Case1) 존재 시 
+  만약 있으면 환경변수를 셋팅하고, NSG를 연결합니다.      
+  ```
+  export SNET={SNET}
+  ```
+  
+  Subnet에 NSG를 연결합니다.   
+  ```
+  az network vnet subnet update \
+     -n ${SNET} \
+     --vnet-name ${VNET} \
+     --network-security-group ${NSG}
+  ```
+
+  Case2) 없을 때   
+  기존에 Subnet이 없는 경우 각 목적별로 Subnet 객체를 생성합니다.  
   - 퍼블릭 서브넷(pub-snet)
     - 외부와 직접 통신이 필요한 서비스 배치
     - 예: 웹 서버, 로드 밸런서
@@ -425,6 +446,14 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   'private-endpoint-network-policies'옵션을 Disable하여 NSG에 설정된 정책이 Subnet에 적용되지 않게 해야 합니다.    
   
   아래 예에서는 모든 Subnet이 동일한 NSG를 공유하나 실제로는 각 Subnet별로 별도의 NSG를 갖는것이 더 일반적입니다.  
+  각 Subnet변수값을 셋팅합니다.   
+  ```
+  export PUB_SNET=${VNET}-pub-snet
+  export PRI_SNET=${VNET}-pri-snet
+  export PE_SNET=${VNET}-pe-snet
+  export PSQL_SNET=${VNET}-psql-snet
+  ```
+
   ```
   # 각 서브넷 생성
   az network vnet subnet create -n ${PUB_SNET} \
@@ -452,14 +481,6 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   az network vnet subnet list --vnet-name ${VNET} -o table 
   ```
 
-  > 참고 : Subnet에 연결된 NSG 변경  
-  > ```
-  > az network vnet subnet update \
-  > -n ${PUB_SNET} \
-  > --vnet-name ${VNET} \
-  > --network-security-group ${RG}-nsg
-  > ```
-
 - 기존 서브넷의 주소 공간과 사용량 확인
   ```
   # 서브넷 상세 정보 확인
@@ -473,7 +494,8 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
 
 ---
 
-## VNET Peering  
+## 참고
+**1.VNET Peering**     
 VNET간에 Peering을 통해 통신할 수 있습니다.  
 실습할 필요는 없고 이론적으로 이해만 하시면 됩니다.  
 
@@ -492,11 +514,7 @@ az network vnet peering create \
 --allow-vnet-access
 ```
 
-| [Top](#목차) |
-
----
-
-## Azure 서비스에 VNET/Subnet 연결  
+**2.Azure 서비스에 VNET/Subnet 연결**     
 
 실습할 필요는 없고 이해만 하시면 됩니다.  
 ```
@@ -507,7 +525,7 @@ az webapp vnet-integration add \
   --subnet ${PE_SNET}
 ```
 
-2. Application Gateway 설정
+**3.Application Gateway 설정**   
 
 ```
 # Application Gateway VNET/Subnet 연결 
@@ -527,26 +545,27 @@ az network application-gateway create \
 AKS 접근을 위한 bastion서버와 nginx 서버 설치를 위해 VM을 생성합니다.  
 bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통해 접근하기 위한 Gateway역할 서버입니다.  
 
-- VNET과 Public Subnet을 확인  
-  아래 명령으로 VNET값을 확인하고 VNET과 Public Subnet변수에 지정    
+- VNET과 Subnet을 확인  
+  아래 명령으로 VNET값을 확인하고 VNET과 Subnet변수에 지정    
   ```
   az network vnet list -o table
   export VNET={VNET}
   ```   
 
-- Public subnet 확인 
+- Subnet 확인 
   ```
   az network vnet subnet list --vnet-name $VNET -o table
   ``` 
   위 결과에서 끝에 pub-snet으로 끝나는 subnet을 PUB_SNET변수에 지정   
+  만약 없는 경우는 존재하는 Subnet으로 지정   
   ```
   ID={본인ID}
-  export PUB_SNET={Public Subnet}
+  export SNET={Subnet}
   ```
 
-- VM 생성
-  Public Subnet에 연결합니다.  
+- VM 생성 
   Size는 2Core/4GB의 사양인 'Standard_B2s'로 지정합니다.  
+  NSG를 널로 지정하여 NIC NSG가 생성되지 않게 함. Subnet의 NSG만 사용하게 함   
   ```
   az vm create \
     -n ${ID}-bastion \
@@ -554,23 +573,30 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
     --admin-username azureuser \
     --generate-ssh-keys \
     --vnet-name ${VNET} \
-    --subnet ${PUB_SNET} \
-    --size Standard_B2s
+    --subnet ${SNET} \
+    --size Standard_B2s \
+    --nsg ""
   ```
 
-  아래 예와 같이 VM과 Disk, NSG, Public IP, NIC 객체가 생성됩니다.   
-  ![](images/2025-02-01-03-32-16.png)  
-
 - PORT 오픈   
-  생성된 NSG의 포트를 오픈 합니다.  
-  NSG의 이름은 VM이름 뒤에 NSG가 붙어서 생성됩니다.  
+  Subnet에 연결된 NSG를 확인합니다.   
+  ```
+  az network vnet subnet show -n ${SNET} --vnet-name $VNET
+  ```
+
+  환경변수값을 셋팅합니다.   
+  ```
+  export NSG={NSG}
+  ```
+
+  NSG에 포트를 오픈 합니다.  
   'priority'는 100~4096사이의 값으로 중복되지 않게 지정합니다.  
   
   ```
   # 80 포트 오픈
   export PORT=80  
   az network nsg rule create \
-  --nsg-name ${ID}-bastionNSG \
+  --nsg-name ${NSG} \
   --name Allow-HTTP-$PORT \
   --priority 100 \
   --access Allow \
@@ -584,7 +610,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   # 443 포트 오픈
   export PORT=443  
   az network nsg rule create \
-  --nsg-name ${ID}-bastionNSG \
+  --nsg-name ${NSG} \
   --name Allow-HTTPS-$PORT \
   --priority 200 \
   --access Allow \
@@ -596,7 +622,7 @@ bastion(베스티언)서버는 AKS를 kubectl이나 nginx와 같은 WAS를 통�
   
   rule 확인  
   ```
-  az network nsg rule list --nsg-name ${ID}-bastionNSG -o table
+  az network nsg rule list --nsg-name ${NSG} -o table
   ```
 
 | [Top](#목차) |
