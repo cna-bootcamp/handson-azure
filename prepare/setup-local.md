@@ -380,9 +380,7 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
   kubens를 실행 파일로 만듭니다.   
   ```
   sudo chmod +x /usr/local/bin/kubens  
-  ```
-
-  > Tip: vi 사용이 힘들면 '/usr/local/bin'디렉토리로 이동 후 empty file을 생성하고 기본 에디터로 열어 만드십시오.   
+  ``` 
 
 - Docker설치   
   필요한 패키지 설치
