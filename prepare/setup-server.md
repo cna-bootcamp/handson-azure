@@ -71,7 +71,7 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 ![](images/2025-01-31-09-33-31.png)
 
 리소스 프로바이더를 등록합니다.
-‘compute’로 필터링한 후 ‘Microsoft.Compute’를 선택하고 상단의 [등록]버튼을 클릭
+1.‘compute’로 필터링한 후 ‘Microsoft.Compute’를 선택하고 상단의 [등록]버튼을 클릭
 ![](images/2025-01-31-09-33-49.png)
 
 ‘Microsoft.Compute’의 상태가 ‘Registered’가 될때까지 기다립니다. 약 3~4분 걸립니다. 
@@ -79,10 +79,12 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 완료 후 ‘사용량 및 할당량’ 메뉴를 클릭하면 리소스 사용 현황과 할당량이 나타납니다. 
 ![](images/2025-01-31-09-34-02.png)
 
-'Microsoft.ContainerService'를 등록합니다.  
+2.'Microsoft.ContainerService'를 등록합니다.  
 ![](images/2025-01-31-11-10-43.png)  
 
-'Microsoft.Storage'룰 등록합니다.  
+3.'Microsoft.Storage'룰 등록합니다.  
+
+4.Microsoft.Sql을 등록합니다.   
 
 | [Top](#목차) |
 
