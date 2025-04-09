@@ -86,6 +86,8 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 
 4.Microsoft.Sql을 등록합니다.   
 
+5.Microsoft.Web을 등록합니다.
+
 | [Top](#목차) |
 
 ---
