@@ -316,7 +316,14 @@ Ubuntu를 설치하여 Window에서 Linux 명령을 사용하도록 설정합니
   az login --use-device-code
   ```
   주의) MobaXTerm에서 수행 시 복사를 위해 CTRL-C를 누르면 수행이 중단됩니다. 드래그만 해도 복사가 됩니다.   
-
+  
+  만약, 인증 실패 시 이전 인증 정보를 삭제하고 다시 합니다.   
+  ```
+  az logout
+  az account clear
+  az cache purge
+  ```
+  
 - Azure 전역 설정    
   명령어에서 반복적으로 사용할 Resource Group과 Location값을 기본 설정에 셋팅합니다.   
   Azure resource group을 확인합니다.  
