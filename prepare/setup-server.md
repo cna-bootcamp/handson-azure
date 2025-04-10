@@ -376,6 +376,7 @@ AKS/ACR의 Naming rule은 아래와 같습니다.
   '24'로 지정하면 2^8승이므로 256개의 IP를 지정할 수 있다는 의미입니다.  
 
   ```
+  export VNET=vnet-handson-01
   export ADDR_PREFIX=10.17.0
 
   # VNet 생성
