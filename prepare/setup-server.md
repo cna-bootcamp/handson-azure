@@ -86,8 +86,8 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 - Microsoft.Storage  
 - Microsoft.Sql   
 - Microsoft.Web
-- Microsoft.EventHun
-- 
+- Microsoft.EventHub
+- Microsoft.EventGrid
 
 | [Top](#목차) |
 
