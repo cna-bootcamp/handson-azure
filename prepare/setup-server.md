@@ -88,7 +88,8 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 - Microsoft.Web
 - Microsoft.EventHub
 - Microsoft.EventGrid
-
+- Microsoft.ServiceBus
+  
 | [Top](#목차) |
 
 ---
