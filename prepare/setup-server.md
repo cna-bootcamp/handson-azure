@@ -82,11 +82,12 @@ VM, CPU, 메모리와 같은 리소스를 사용하기 위해 리소스 프로�
 2.'Microsoft.ContainerService'를 등록합니다.  
 ![](images/2025-01-31-11-10-43.png)  
 
-3.'Microsoft.Storage'룰 등록합니다.  
-
-4.Microsoft.Sql을 등록합니다.   
-
-5.Microsoft.Web을 등록합니다.
+3.추가 등록 리소스 프로파이더
+- Microsoft.Storage  
+- Microsoft.Sql   
+- Microsoft.Web
+- Microsoft.EventHun
+- 
 
 | [Top](#목차) |
 
