@@ -577,7 +577,7 @@ Docker는 컨테이너 이미지를 만들고 실행하는 툴입니다.
 - 설치하기  
   Mac사용자는 아래 명령으로 설치하고 실행합니다.     
   ```
-  brew install --cast docker
+  brew install --cask docker
   open -a docker
   ```
 
